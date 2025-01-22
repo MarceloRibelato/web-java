@@ -1,0 +1,38 @@
+name: Cucumber Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-cucumber-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout do código
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Configurar o JDK
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17' # Altere para a versão necessária do Java
+
+    # Instalar dependências com Maven
+    - name: Install dependencies
+      run: mvn clean install -DskipTests
+
+    # Executar os testes do Cucumber
+    - name: Run Cucumber tests
+      run: mvn test -Dcucumber.options="--tags @login"
+
+    # Publicar os resultados dos testes
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: cucumber-results
+        path: target/cucumber.json
